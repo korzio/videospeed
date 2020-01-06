@@ -4,7 +4,7 @@ chrome.runtime.sendMessage({}, function(response) {
       speed: 1.0,           // default 1x
       resetSpeed: 1.0,      // default 1x
       speedStep: 0.1,       // default 0.1x
-      fastSpeed: 1.8,       // default 1.8x
+      fastSpeed: 15,       // default 15x
       rewindTime: 10,       // default 10s
       advanceTime: 10,      // default 10s
       resetKeyCode:  82,    // default: R
@@ -201,6 +201,8 @@ chrome.runtime.sendMessage({}, function(response) {
           }
         }
       }
+    } else if (document) {
+      initializeNow(document);
     }
   }
 
@@ -316,11 +318,18 @@ chrome.runtime.sendMessage({}, function(response) {
 
   function runAction(action, document, keyboard, e) {
     var videoTags = document.getElementsByTagName('video');
-    videoTags.forEach = Array.prototype.forEach;
+    if(~document.location.href.indexOf('learning.oreilly')) {
+      var frame = document.getElementsByTagName('iframe')[0]
+      if(frame) {
+        var moreVideos = frame.contentDocument.getElementsByTagName('video')
+        videoTags = [...videoTags, ...moreVideos]
+      }
+    }
 
+    videoTags.forEach = Array.prototype.forEach;
     videoTags.forEach(function(v) {
       var id = v.dataset['vscid'];
-      var controller = document.querySelector(`div[data-vscid="${id}"]`);
+      var controller = document.querySelector(`div[data-vscid="${id}"]`) || v
 
       showController(controller);
 
